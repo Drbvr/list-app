@@ -1,0 +1,52 @@
+# Swift
+.DS_Store
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/
+*.xcworkspace
+Package.resolved
+
+# Build products
+*.o
+*.lo
+*.la
+*.al
+.libs
+*.so
+*.a
+*.dylib
+*.exe
+*.out
+
+# Xcode
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Testing
+.coverage
+*.gcda
+*.gcno
+*.profdata
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+
+# Temporary files
+*.swp
+*.swo
+*~
