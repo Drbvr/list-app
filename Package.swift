@@ -5,6 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "ListApp",
+    platforms: [
+        .iOS(.v17),
+        .macOS(.v14),
+    ],
     products: [
         .library(
             name: "Core",
@@ -14,6 +18,11 @@ let package = Package(
         .target(
             name: "Core",
             path: "Sources/Core"),
+        .executableTarget(
+            name: "ListApp",
+            dependencies: ["Core"],
+            path: "ListApp",
+            exclude: ["README.md"]),
         .testTarget(
             name: "CoreTests",
             dependencies: ["Core"],
