@@ -23,14 +23,17 @@ class AppState {
 
         for item in items {
             for tag in item.tags {
+                guard !tag.isEmpty else { continue }
                 let parts = tag.split(separator: "/")
-                let topLevel = String(parts[0])
+                guard let firstPart = parts.first else { continue }
+                let topLevel = String(firstPart)
                 groups[topLevel, default: Set()].insert(tag)
             }
         }
 
         return groups.keys.sorted().map { topLevel in
-            let children = groups[topLevel]!.sorted().map { childTag in
+            let childrenSet = groups[topLevel] ?? Set()
+            let children = childrenSet.sorted().map { childTag in
                 let count = items.filter { $0.tags.contains(childTag) }.count
                 return (tag: childTag, count: count)
             }
