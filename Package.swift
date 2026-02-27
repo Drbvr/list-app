@@ -18,11 +18,6 @@ let package = Package(
         .target(
             name: "Core",
             path: "Sources/Core"),
-        .executableTarget(
-            name: "ListApp",
-            dependencies: ["Core"],
-            path: "ListApp",
-            exclude: ["README.md"]),
         .testTarget(
             name: "CoreTests",
             dependencies: ["Core"],

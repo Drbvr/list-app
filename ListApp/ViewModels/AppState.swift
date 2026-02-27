@@ -85,6 +85,11 @@ class AppState {
         if let index = items.firstIndex(where: { $0.id == item.id }) {
             items[index].completed.toggle()
             items[index].updatedAt = Date()
+
+            // Persist change to file asynchronously
+            Task {
+                _ = await fileSystemManager.toggleTodoCompletion(items[index])
+            }
         }
     }
 
@@ -105,7 +110,7 @@ class AppState {
     // MARK: - Search
 
     func searchItems(query: String) -> [Item] {
-        guard !query.isEmpty else { return [] }
+        guard !query.isEmpty else { return items }  // Return all items when search is empty
         let results = searchEngine.search(query: query, in: items)
         return results.map { $0.item }
     }
