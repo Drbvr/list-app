@@ -3,13 +3,44 @@ import Core
 
 @Observable
 class AppState {
-    var items: [Item] = MockData.allItems
+    var items: [Item]
     var savedViews: [SavedView] = MockData.savedViews
     var listTypes: [ListType] = MockData.listTypes
 
     private let filterEngine = ItemFilterEngine()
     private let searchEngine = FullTextSearchEngine()
     private let tagHierarchyHelper = TagHierarchy()
+    private let fileSystemManager = AppFileSystemManager()
+
+    init() {
+        // Try to load from real files, fallback to mock data if no files found
+        let documentsURL = FileManager.default
+            .urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let vaultURL = documentsURL.appendingPathComponent("ListAppVault")
+
+        // Check if vault exists
+        if FileManager.default.fileExists(atPath: vaultURL.path) {
+            // Try to load real files (synchronously for init)
+            var loadedItems: [Item] = []
+            let coreFileSystem = DefaultFileSystemManager()
+            let todoParser = ObsidianTodoParser()
+
+            if case .success(let filePaths) = coreFileSystem.scanDirectory(at: vaultURL.path, recursive: true) {
+                for filePath in filePaths {
+                    if case .success(let content) = coreFileSystem.readFile(at: filePath) {
+                        let items = todoParser.parseTodos(from: content, sourceFile: filePath)
+                        loadedItems.append(contentsOf: items)
+                    }
+                }
+            }
+
+            // Use loaded items if found, otherwise fall back to mock
+            self.items = loadedItems.isEmpty ? MockData.allItems : loadedItems
+        } else {
+            // No vault folder, use mock data
+            self.items = MockData.allItems
+        }
+    }
 
     // MARK: - Computed Properties
 
