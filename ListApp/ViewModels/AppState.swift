@@ -6,6 +6,7 @@ class AppState {
     var items: [Item]
     var savedViews: [SavedView] = MockData.savedViews
     var listTypes: [ListType] = MockData.listTypes
+    var isLoadingItems: Bool = false
 
     private let filterEngine = ItemFilterEngine()
     private let searchEngine = FullTextSearchEngine()
@@ -13,32 +14,47 @@ class AppState {
     private let fileSystemManager = AppFileSystemManager()
 
     init() {
-        // Try to load from real files, fallback to mock data if no files found
+        // Initialize with mock data immediately to avoid blocking UI
+        self.items = MockData.allItems
+
+        // Load real files asynchronously in the background
+        Task {
+            await loadItemsFromVault()
+        }
+    }
+
+    /// Load items from vault asynchronously to avoid blocking UI thread
+    private func loadItemsFromVault() async {
+        isLoadingItems = true
+        defer { isLoadingItems = false }
+
         let documentsURL = FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)[0]
         let vaultURL = documentsURL.appendingPathComponent("ListAppVault")
 
         // Check if vault exists
-        if FileManager.default.fileExists(atPath: vaultURL.path) {
-            // Try to load real files (synchronously for init)
-            var loadedItems: [Item] = []
-            let coreFileSystem = DefaultFileSystemManager()
-            let todoParser = ObsidianTodoParser()
+        guard FileManager.default.fileExists(atPath: vaultURL.path) else {
+            // No vault folder, keep using mock data
+            return
+        }
 
-            if case .success(let filePaths) = coreFileSystem.scanDirectory(at: vaultURL.path, recursive: true) {
-                for filePath in filePaths {
-                    if case .success(let content) = coreFileSystem.readFile(at: filePath) {
-                        let items = todoParser.parseTodos(from: content, sourceFile: filePath)
-                        loadedItems.append(contentsOf: items)
-                    }
+        // Try to load real files asynchronously
+        var loadedItems: [Item] = []
+        let coreFileSystem = DefaultFileSystemManager()
+        let todoParser = ObsidianTodoParser()
+
+        if case .success(let filePaths) = coreFileSystem.scanDirectory(at: vaultURL.path, recursive: true) {
+            for filePath in filePaths {
+                if case .success(let content) = coreFileSystem.readFile(at: filePath) {
+                    let parsedItems = todoParser.parseTodos(from: content, sourceFile: filePath)
+                    loadedItems.append(contentsOf: parsedItems)
                 }
             }
+        }
 
-            // Use loaded items if found, otherwise fall back to mock
-            self.items = loadedItems.isEmpty ? MockData.allItems : loadedItems
-        } else {
-            // No vault folder, use mock data
-            self.items = MockData.allItems
+        // Update items if we found any
+        if !loadedItems.isEmpty {
+            self.items = loadedItems
         }
     }
 
