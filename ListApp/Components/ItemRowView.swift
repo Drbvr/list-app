@@ -14,6 +14,14 @@ struct ItemRowView: View {
                         .font(.title3)
                 }
                 .buttonStyle(.plain)
+            } else if item.type == "book" {
+                Image(systemName: item.completed ? "book.closed.fill" : "book.closed")
+                    .foregroundStyle(item.completed ? .green : .secondary)
+                    .font(.title3)
+            } else if item.type == "movie" {
+                Image(systemName: item.completed ? "eye.fill" : "eye")
+                    .foregroundStyle(item.completed ? .green : .secondary)
+                    .font(.title3)
             }
 
             VStack(alignment: .leading, spacing: 4) {

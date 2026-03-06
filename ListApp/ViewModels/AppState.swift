@@ -7,6 +7,9 @@ class AppState {
     var savedViews: [SavedView] = MockData.savedViews
     var listTypes: [ListType] = MockData.listTypes
     var isLoadingItems: Bool = false
+    var selectedTheme: String {
+        didSet { UserDefaults.standard.set(selectedTheme, forKey: "selectedTheme") }
+    }
 
     private let filterEngine = ItemFilterEngine()
     private let searchEngine = FullTextSearchEngine()
@@ -16,6 +19,7 @@ class AppState {
     init() {
         // Initialize with mock data immediately to avoid blocking UI
         self.items = MockData.allItems
+        self.selectedTheme = UserDefaults.standard.string(forKey: "selectedTheme") ?? "system"
 
         // Load real files asynchronously in the background
         Task {
