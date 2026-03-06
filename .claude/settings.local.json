@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(swift test:*)",
+      "Bash(swift build:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(xcrun simctl install:*)",
+      "Bash(find:*)",
+      "Bash(xcrun simctl launch:*)",
+      "Bash(xcrun simctl terminate:*)",
+      "Bash(xcrun simctl listapps:*)",
+      "Bash(__NEW_LINE_a0535c2c481d1820__ xcrun simctl uninstall booted com.bvanriessen.listapp)",
+      "Bash(xcrun simctl uninstall:*)"
+    ]
+  }
+}
