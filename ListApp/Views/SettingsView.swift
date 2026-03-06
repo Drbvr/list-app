@@ -3,7 +3,6 @@ import Core
 
 struct SettingsView: View {
     @Environment(AppState.self) private var appState
-    @State private var selectedTheme = "system"
     @State private var defaultDisplayStyle = DisplayStyle.list
     @State private var showFolderPicker = false
     @State private var vaultFolderName: String = {
@@ -64,7 +63,7 @@ struct SettingsView: View {
                                 .frame(width: 24)
                             Text(listType.name.capitalized)
                             Spacer()
-                            let count = appState.items.filter { $0.type == listType.name }.count
+                            let count = appState.items.filter { $0.type.lowercased() == listType.name.lowercased() }.count
                             Text("\(count) items")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -75,7 +74,7 @@ struct SettingsView: View {
 
             // MARK: Appearance
             Section("Appearance") {
-                Picker("Theme", selection: $selectedTheme) {
+                Picker("Theme", selection: Bindable(appState).selectedTheme) {
                     Label("System", systemImage: "circle.lefthalf.filled").tag("system")
                     Label("Light", systemImage: "sun.max").tag("light")
                     Label("Dark", systemImage: "moon").tag("dark")
